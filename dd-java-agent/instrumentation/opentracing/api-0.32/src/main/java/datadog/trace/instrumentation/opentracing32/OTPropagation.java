@@ -6,7 +6,6 @@ import datadog.trace.bootstrap.instrumentation.api.AgentPropagation;
 import datadog.trace.bootstrap.instrumentation.api.CachingContextVisitor;
 import io.opentracing.propagation.TextMapExtract;
 import io.opentracing.propagation.TextMapInject;
-import java.util.HashMap;
 import java.util.Map;
 
 class OTPropagation {
@@ -21,13 +20,9 @@ class OTPropagation {
   }
 
   static class TextMapExtractGetter extends CachingContextVisitor<TextMapExtract> {
-    private final Map<String, String> extracted = new HashMap<>();
+    static final TextMapExtractGetter INSTANCE = new TextMapExtractGetter();
 
-    TextMapExtractGetter(final TextMapExtract carrier) {
-      for (final Map.Entry<String, String> entry : carrier) {
-        extracted.put(entry.getKey(), entry.getValue());
-      }
-    }
+    private TextMapExtractGetter() {}
 
     @Override
     public void forEachKey(
@@ -36,7 +31,7 @@ class OTPropagation {
         AgentPropagation.KeyValueConsumer consumer) {
       // This is the same as the one passed into the constructor
       // So using "extracted" is valid
-      for (Map.Entry<String, String> entry : extracted.entrySet()) {
+      for (Map.Entry<String, String> entry : carrier) {
         String lowerCaseKey = toLowerCase(entry.getKey());
         int classification = classifier.classify(lowerCaseKey);
         if (classification != IGNORE) {
