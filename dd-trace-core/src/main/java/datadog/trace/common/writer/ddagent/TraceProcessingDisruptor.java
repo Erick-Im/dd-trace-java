@@ -55,7 +55,7 @@ public class TraceProcessingDisruptor implements AutoCloseable {
             ProducerType.MULTI,
             // use sleeping wait strategy because it reduces CPU usage,
             // and is cheaper for application threads publishing traces
-            new SleepingWaitStrategy(0, MILLISECONDS.toNanos(10)));
+            new SleepingWaitStrategy(0));
     disruptor.handleEventsWith(
         new TraceSerializingHandler(
             dispatchingDisruptor, monitor, writer, serializer, flushInterval, timeUnit));
